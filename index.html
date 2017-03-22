@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+	<title>1-50</title>
+	<link rel="stylesheet" href="./weui.css"/>
+	<style>
+		#app {
+			text-align:center;
+			width: 100%;
+		}
+		.board {
+			width:300px;
+			list-style-type: none;
+		}
+		.square {
+			width:50px;
+			height:50px;
+			line-height: 50px;
+			float:left;
+			border:1px solid;
+			margin:4px;
+			cursor:pointer;
+			text-align: center;
+			vertical-align: center;
+			font-size: 24px;
+		}
+		.bottom-area {
+			width: 60%;
+			font-size: 24px;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+		<ul class="board">
+			<li class="square" v-for="(num, index) in numbers" @click="click(numbers, index)">{{num}}</li>
+		</ul>
+		<div class="bottom-area">
+			<a href="javascript:;" class="weui-btn weui-btn_plain-primary" @click="start" v-show="!running">开始</a>
+			<div v-show="!running">您的成绩 {{formatMinutes}}:{{formatSeconds}}</div>
+			<div v-show="running">{{formatMinutes}}:{{formatSeconds}}</div>
+		</div>
+	</div>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script>
+		function shuffle(arr){
+			var length = arr.length,
+			temp,
+			random;
+			while(0 != length){
+				random = Math.floor(Math.random() * length)
+				length--;
+		        // swap
+		        temp = arr[length];
+		        arr[length] = arr[random];
+		        arr[random] = temp;
+		    }
+		    return arr;
+		}
+		var num1to25 = new Array();
+		for (var i=1; i<=25; i++) {
+			num1to25.push(i);
+		}
+		var num26to50 = new Array();
+		for (var i=26; i<=50; i++) {
+			num26to50.push(i);
+		}
+		var shuffleNumbers = shuffle(num1to25).concat(shuffle(num26to50));
+		var app = new Vue({
+			el: "#app",
+			data: {
+				numbers: shuffleNumbers.slice(0, 25),
+				count: 1,
+				minutes: 0,
+				seconds: 0,
+				running: false
+			},
+			computed: {
+				formatMinutes: function() {
+					if (this.minutes < 10) return ('0' + this.minutes);
+					return this.minutes;
+				},
+				formatSeconds: function() {
+					if (this.seconds < 10) return ('0' + this.seconds);
+					return this.seconds;
+				}
+			},
+			methods: {
+				start: function() {
+					this.minutes=0;
+					this.seconds=0;
+					this.running = true;
+					var self = this;
+					var updateClock = function() {
+						if (!self.running) return;
+						self.seconds++;
+						if (self.seconds > 59) {
+							self.minutes++;
+							self.seconds -= 60;
+						}
+						if (self.running) {
+							setTimeout(updateClock, 1000);
+						}
+					};
+					setTimeout(updateClock, 1000);
+				},
+				click: function(numbers, index) {
+					if (!this.running) return;
+					console.log(numbers[index], this.count)
+					if (numbers[index] == this.count) {
+						if (this.count <= 25) {
+							numbers.splice(index, 1, shuffleNumbers[index+25]);
+						} else {
+							numbers.splice(index, 1, '');
+						}
+						this.count++;
+						if (this.count > 50) {
+							this.running = false;
+						}
+					}
+				}
+			}
+		})
+	</script>
+</body>
+</html>
