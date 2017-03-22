@@ -38,7 +38,8 @@
 			<li class="square" v-for="(num, index) in numbers" @click="click(numbers, index)">{{num}}</li>
 		</ul>
 		<div class="bottom-area">
-			<a href="javascript:;" class="weui-btn weui-btn_plain-primary" @click="start" v-show="!running">开始</a>
+			<a href="javascript:;" class="weui-btn weui-btn_plain-primary" @click="start" v-show="!running && !complete">开始</a>
+			<a href="javascript:;" class="weui-btn weui-btn_plain-primary" @click="reset" v-show="complete">再来一次</a>
 			<div v-show="!running">您的成绩 {{formatMinutes}}:{{formatSeconds}}</div>
 			<div v-show="running">{{formatMinutes}}:{{formatSeconds}}</div>
 		</div>
@@ -75,7 +76,8 @@
 				count: 1,
 				minutes: 0,
 				seconds: 0,
-				running: false
+				running: false,
+				complete: false
 			},
 			computed: {
 				formatMinutes: function() {
@@ -118,8 +120,18 @@
 						this.count++;
 						if (this.count > 50) {
 							this.running = false;
+							this.complete = true;
 						}
 					}
+				},
+				reset: function() {
+					this.minutes=0;
+					this.seconds=0;
+					this.count=1;
+					this.running=false;
+					this.complete=false;
+					shuffleNumbers = shuffle(num1to25).concat(shuffle(num26to50));
+					this.numbers = shuffleNumbers.slice(0, 25);
 				}
 			}
 		})
